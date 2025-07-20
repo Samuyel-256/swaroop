@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JARVIS Voice Assistant</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    .talk {
+      background-color: #1f1fff;
+      color: white;
+      font-size: 1.2rem;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 30px;
+      transition: 0.3s;
+    }
+
+    .talk:hover {
+      background-color: #3f3fff;
+    }
+
+    .content {
+      margin-top: 30px;
+      font-size: 1.3rem;
+      font-weight: 500;
+      word-wrap: break-word;
+      max-width: 90%;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .talk {
+        font-size: 1rem;
+        padding: 10px 18px;
+      }
+
+      .content {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧠 JARVIS Voice Assistant</h1>
+  <button class="talk">🎤 Talk to JARVIS</button>
+  <div class="content">Say something like "Open Google"</div>
+
+  <script>
+    const btn = document.querySelector('.talk');
+    const content = document.querySelector('.content');
+
+    function speak(text) {
+      const speech = new SpeechSynthesisUtterance(text);
+      speech.rate = 1;
+      speech.pitch = 1;
+      speech.volume = 1;
+      window.speechSynthesis.speak(speech);
+    }
+
+    function wishMe() {
+      const hour = new Date().getHours();
+      if (hour >= 0 && hour < 12) {
+        speak("Good Morning Boss...");
+      } else if (hour >= 12 && hour < 17) {
+        speak("Good Afternoon Master...");
+      } else {
+        speak("Good Evening Sir...");
+      }
+    }
+
+    window.addEventListener('load', () => {
+      speak("Initializing JARVIS...");
+      wishMe();
+    });
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Speech Recognition is not supported in this browser. Please use Google Chrome.");
+    } else {
+      const recognition = new SpeechRecognition();
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        content.textContent = transcript;
+        takeCommand(transcript.toLowerCase());
+      };
+
+      btn.addEventListener('click', () => {
+        content.textContent = "Listening...";
+        recognition.start();
+      });
+
+      function takeCommand(message) {
+        if (message.includes('hey') || message.includes('hello')) {
+          speak("Hello Sir, How may I help you?");
+        } else if (message.includes("open google")) {
+          window.open("https://google.com", "_blank");
+          speak("Opening Google...");
+        } else if (message.includes("open youtube")) {
+          window.open("https://youtube.com", "_blank");
+          speak("Opening YouTube...");
+        } else if (message.includes("open facebook")) {
+          window.open("https://facebook.com", "_blank");
+          speak("Opening Facebook...");
+        } else if (message.includes('what is') || message.includes('who is') || message.includes('what are')) {
+          window.open(`https://www.google.com/search?q=${message.replace(/\s/g, "+")}`, "_blank");
+          speak("Here is what I found on the internet about " + message);
+        } else if (message.includes('wikipedia')) {
+          window.open(`https://en.wikipedia.org/wiki/${message.replace("wikipedia", "").trim()}`, "_blank");
+          speak("Here is what I found on Wikipedia about " + message);
+        } else if (message.includes('time')) {
+          const time = new Date().toLocaleTimeString();
+          speak("The current time is " + time);
+        } else if (message.includes('date')) {
+          const date = new Date().toLocaleDateString();
+          speak("Today's date is " + date);
+        } else if (message.includes('calculator')) {
+          window.open("https://www.google.com/search?q=calculator", "_blank");
+          speak("Opening Calculator...");
+        } else {
+          window.open(`https://www.google.com/search?q=${message.replace(/\s/g, "+")}`, "_blank");
+          speak("I found this information for " + message + " on Google");
+        }
+      }
+    }
+  </script>
+
+</body>
+</html>
